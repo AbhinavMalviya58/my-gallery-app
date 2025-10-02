@@ -3,7 +3,10 @@ import { useNavigation } from '@react-navigation/native';
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useCallback, useEffect } from 'react';
-import { Button, Platform, View } from 'react-native';
+import { Platform, View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { AntDesign } from '@expo/vector-icons';
+
 WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = () => {
@@ -20,8 +23,7 @@ const LoginScreen = () => {
     try {
       const redirectUrl = AuthSession.makeRedirectUri({
         scheme: 'mygalleryapp',
-        path: 'sso-callback', // optional
-        // for quick dev testing you could set useProxy: true, but prefer dev client
+        path: 'sso-callback',
       });
 
       const res = await startSSOFlow({
@@ -35,32 +37,99 @@ const LoginScreen = () => {
         await setActive({
           session: createdSessionId,
           navigate: async () => {
-            // Switch to the authenticated tabs in React Navigation stack
-            // Use replace to avoid going back to Login
-            // @ts-ignore - name exists in our stack
+            // Switch to authenticated tabs
+            // @ts-ignore
             navigation.replace?.('MainTabs');
           },
         });
         return;
       }
 
-      // If no createdSessionId then check signIn / signUp flow objects for extra steps.
       console.log('SSO result (no session):', { signIn, signUp });
     } catch (err) {
       console.error('Google SSO error:', err);
     }
   }, [startSSOFlow, navigation]);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
+    <LinearGradient
+      colors={['#ff3c00ff', '#00f2fe']}
+      style={styles.container}
     >
-      <Button title='Sign in with Google' onPress={onGooglePress} />
-    </View>
+      <View style={styles.card}>
+        <Image
+  source={require('../../../assets/app_logo.png')}
+  style={styles.logo}
+  resizeMode="contain"
+/>
+        <Text style={styles.title}>Welcome to MyGalleryApp</Text>
+        <Text style={styles.subtitle}>
+          Sign in to continue
+        </Text>
+
+        <TouchableOpacity style={styles.googleBtn} onPress={onGooglePress}>
+          <AntDesign name="google" size={22} color="#EA4335" style={{ marginRight: 8 }} />
+          <Text style={styles.googleBtnText}>Sign in with Google</Text>
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    width: '85%',
+    padding: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  googleBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+});
 
 export default LoginScreen;

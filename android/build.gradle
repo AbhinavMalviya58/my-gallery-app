@@ -6,9 +6,11 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath('com.android.tools.build:gradle')
+    // Update the Android Gradle Plugin to a modern version
+    classpath('com.android.tools.build:gradle:8.12.3')
     classpath('com.facebook.react:react-native-gradle-plugin')
-    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+    // Add a compatible Kotlin version
+    classpath('org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20')
   }
 }
 
